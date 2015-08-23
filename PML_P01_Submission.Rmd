@@ -12,7 +12,7 @@ Loading and preprocessing the data
 ```{r, echo=FALSE}
 library(caret)
 getwd()
-setwd("C:/Users/ssomasundharam/Documents/Data Science/Coursera R/Reproducible Research")
+setwd("C:/Users/ssomasundharam/Documents/Data Science/Coursera R/Practical Machine Learning")
 # traincsv<-"https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
 # testcsv<-"https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
 
