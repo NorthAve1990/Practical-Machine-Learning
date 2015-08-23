@@ -58,25 +58,19 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 </div>
 
 
-<p>Loading and preprocessing the data</p>
-<ol style="list-style-type: decimal">
-<li>Load the data (i.e. read.csv())</li>
-<li>Process/transform the data (if necessary) into a format suitable for your analysis</li>
-</ol>
+<p>Practical Machine Learning is gaining actionable insight, more accurate foresight, and relevant inferences into your data. One of the most common tasks are prediction and machine learning. This project use data which is now possible to collect a large amount of data about personal activity using devices such as Jawbone Up, Nike FuelBand, and Fitbit. The project will provide basic concepts such as training and tests datasets, over fitting and error rates. The project will also explain the model practical machine learning methods and building prediction based on the training and test datasets.</p>
+<p>Download the data from web site</p>
 <pre><code>## Warning: package 'caret' was built under R version 3.1.3</code></pre>
 <pre><code>## Loading required package: lattice
 ## Loading required package: ggplot2</code></pre>
 <pre><code>## Warning: package 'ggplot2' was built under R version 3.1.1</code></pre>
 <pre><code>## [1] &quot;C:/Users/ssomasundharam/Documents/Data Science/Coursera R/Practical Machine Learning&quot;</code></pre>
-<p>What is mean total number of steps taken per day?</p>
-<ol style="list-style-type: decimal">
-<li>Make a histogram of the total number of steps taken each day</li>
-<li>Calculate and report the mean and median total number of steps taken per day</li>
-</ol>
+<p>Loading and preprocessing the data</p>
 <pre class="r"><code># download.file(traincsv, destfile = &quot;pml-training.csv&quot;)
 # download.file(testcsv, destfile = &quot;pml-testing.csv&quot;)
 # download.file(traincsv, destfile = &quot;pml-training.csv&quot;, method = &quot;curl&quot;)
 # download.file(testcsv, destfile = &quot;pml-testing.csv&quot;, method = &quot;curl&quot;)</code></pre>
+<p>Training and test dataset</p>
 <pre class="r"><code>trainingraw &lt;- read.table(&quot;pml-training.csv&quot;,sep=&quot;,&quot;,na.strings = c(&quot;NA&quot;,&quot;&quot;),header=TRUE)
 testing &lt;- read.table(&quot;pml-testing.csv&quot;,sep=&quot;,&quot;,na.strings = c(&quot;NA&quot;,&quot;&quot;),header=TRUE)
 
@@ -101,6 +95,7 @@ validation &lt;- validation[, -(1:5)]</code></pre>
 <pre class="r"><code>fitControl &lt;- trainControl(method=&quot;cv&quot;, number=3, verboseIter=F)
 fittraining &lt;- train(classe ~ ., data=training, method=&quot;rf&quot;, trControl=fitControl)
 save(fittraining, file=&quot;fittraining.RData&quot;)</code></pre>
+<p>Save the fit training model</p>
 <pre class="r"><code># rm(trainingraw)
 
 load(file = &quot;fittraining.RData&quot;)
@@ -110,13 +105,15 @@ fittraining$results</code></pre>
 <h3>Error estimation with cross validation</h3>
 <p>Using the model that we’ve trained, we’re performing a cross validation with the rest of data from the dataset reserved for this reason. The out of error rate is expected to be less than 1%, as the accuracy of the model observed above is 99.88%.</p>
 <pre class="r"><code># traincontrol &lt;- trainControl(method = &quot;cv&quot;, number = 5)</code></pre>
+<p>Save the fit testing model</p>
 <pre class="r"><code>fitvalidation &lt;- train(classe ~ ., data=validation, method=&quot;rf&quot;, trControl=fitControl)
 save(fitvalidation, file=&quot;fitvalidation.RData&quot;)</code></pre>
+<p>load the fit testing model</p>
 <pre class="r"><code>load(file=&quot;fitvalidation.RData&quot;)
 fitvalidation$resample
 fitvalidation$results
 confusionMatrix(predict(fitvalidation, newdata=validation), validation$classe)</code></pre>
-<p>Indeed, by calculating the out of sample error (the cross-validation estimate is an out-of-sample estimate) we get the value of <code>0.54%</code>:</p>
+<p>Calculating the out of sample error (the cross-validation estimate is an out-of-sample estimate) we get the value of <code>0.54%</code>:</p>
 <pre class="r"><code>fitvalidation$finalModel</code></pre>
 </div>
 <div id="predict-the-20-test-cases" class="section level3">

@@ -4,10 +4,9 @@ author: "Sridhar Somasundharam"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: html_document
 ---
-Loading and preprocessing the data
+Practical Machine Learning is gaining actionable insight, more accurate foresight, and relevant inferences into your data. One of the most common tasks are prediction and machine learning. This project use data which is now possible to collect a large amount of data about personal activity using devices such as Jawbone Up, Nike FuelBand, and Fitbit.  The project will provide basic concepts such as training and tests datasets, over fitting and error rates. The project will also explain the model practical machine learning methods and building prediction based on the training and test datasets. 
 
-1. Load the data (i.e. read.csv())
-2. Process/transform the data (if necessary) into a format suitable for your analysis
+Download the data from web site
 
 ```{r, echo=FALSE}
 library(caret)
@@ -18,10 +17,7 @@ setwd("C:/Users/ssomasundharam/Documents/Data Science/Coursera R/Practical Machi
 
 ```
 
-What is mean total number of steps taken per day?
-
-1. Make a histogram of the total number of steps taken each day
-2. Calculate and report the mean and median total number of steps taken per day
+Loading and preprocessing the data
 
 ```{r, eval=FALSE}
 
@@ -31,6 +27,8 @@ What is mean total number of steps taken per day?
 # download.file(testcsv, destfile = "pml-testing.csv", method = "curl")
 
 ```
+
+Training and test dataset
 
 ```{r}
 
@@ -67,6 +65,8 @@ save(fittraining, file="fittraining.RData")
 
 ```
 
+Save the fit training model
+
 ```{r, eval=FALSE}
 
 # rm(trainingraw)
@@ -86,12 +86,16 @@ Using the model that we've trained, we're performing a cross validation with the
 
 ```
 
+Save the fit testing model
+
 ```{r,eval=FALSE}
 
 fitvalidation <- train(classe ~ ., data=validation, method="rf", trControl=fitControl)
 save(fitvalidation, file="fitvalidation.RData")
 
 ```
+
+load the fit testing model
 
 ```{r,eval=FALSE}
 
@@ -102,7 +106,7 @@ confusionMatrix(predict(fitvalidation, newdata=validation), validation$classe)
 
 ```
 
-Indeed, by calculating the out of sample error (the cross-validation estimate is an out-of-sample estimate) we get the value of `0.54%`:
+Calculating the out of sample error (the cross-validation estimate is an out-of-sample estimate) we get the value of `0.54%`:
 
 ```{r,eval=FALSE}
 
