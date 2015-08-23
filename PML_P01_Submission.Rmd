@@ -1,0 +1,130 @@
+---
+title: "PML_P01_Submission"
+author: "Sridhar Somasundharam"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+Loading and preprocessing the data
+
+1. Load the data (i.e. read.csv())
+2. Process/transform the data (if necessary) into a format suitable for your analysis
+
+```{r, echo=FALSE}
+library(caret)
+getwd()
+setwd("C:/Users/ssomasundharam/Documents/Data Science/Coursera R/Reproducible Research")
+# traincsv<-"https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+# testcsv<-"https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+
+```
+
+What is mean total number of steps taken per day?
+
+1. Make a histogram of the total number of steps taken each day
+2. Calculate and report the mean and median total number of steps taken per day
+
+```{r, eval=FALSE}
+
+# download.file(traincsv, destfile = "pml-training.csv")
+# download.file(testcsv, destfile = "pml-testing.csv")
+# download.file(traincsv, destfile = "pml-training.csv", method = "curl")
+# download.file(testcsv, destfile = "pml-testing.csv", method = "curl")
+
+```
+
+```{r}
+
+trainingraw <- read.table("pml-training.csv",sep=",",na.strings = c("NA",""),header=TRUE)
+testing <- read.table("pml-testing.csv",sep=",",na.strings = c("NA",""),header=TRUE)
+
+inTrain <- createDataPartition(trainingraw$classe, p=0.70, list=FALSE)
+training <- trainingraw[inTrain,]
+validation <- trainingraw[-inTrain,]
+
+nearz <- nearZeroVar(training)
+training <- training[, -nearz]
+validation <- validation[, -nearz]
+
+mostlyNA <- sapply(training, function(x) mean(is.na(x))) > 0.95
+training <- training[, mostlyNA==F]
+validation <- validation[, mostlyNA==F]
+
+
+training <- training[, -(1:5)]
+validation <- validation[, -(1:5)]
+
+```
+
+### Model building
+
+Fit a model using random forest, running in parallel with 8 processes on i7 the training of the model took ~22 minutes.
+
+```{r, eval=FALSE}
+
+fitControl <- trainControl(method="cv", number=3, verboseIter=F)
+fittraining <- train(classe ~ ., data=training, method="rf", trControl=fitControl)
+save(fittraining, file="fittraining.RData")
+
+```
+
+```{r, eval=FALSE}
+
+# rm(trainingraw)
+
+load(file = "fittraining.RData")
+fittraining$results
+
+```
+
+### Error estimation with cross validation
+
+Using the model that we've trained, we're performing a cross validation with the rest of data from the dataset reserved for this reason. The out of error rate is expected to be less than 1%, as the accuracy of the model observed above is 99.88%.
+
+```{r}
+
+# traincontrol <- trainControl(method = "cv", number = 5)
+
+```
+
+```{r,eval=FALSE}
+
+fitvalidation <- train(classe ~ ., data=validation, method="rf", trControl=fitControl)
+save(fitvalidation, file="fitvalidation.RData")
+
+```
+
+```{r,eval=FALSE}
+
+load(file="fitvalidation.RData")
+fitvalidation$resample
+fitvalidation$results
+confusionMatrix(predict(fitvalidation, newdata=validation), validation$classe)
+
+```
+
+Indeed, by calculating the out of sample error (the cross-validation estimate is an out-of-sample estimate) we get the value of `0.54%`:
+
+```{r,eval=FALSE}
+
+fitvalidation$finalModel
+
+```
+
+### Predict the 20 test cases
+
+Finally, to predict the classe of the testing dataset, we're applying the prediction using the model we've trained and output the results in the respective files as adviced by the instructor:
+
+```{r,eval=FALSE}
+
+test_prediction <- predict(fittraining, newdata=testing)
+test_prediction
+pml_write_files = function(x){
+    n = length(x)
+    for(i in 1:n){
+        filename = paste0("problem_id_",i,".txt")
+        write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+    }
+}
+pml_write_files(test_prediction)
+
+```
